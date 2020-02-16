@@ -14,8 +14,7 @@
     "dropbox": "^4.0.30",
     "express": "^4.17.1",
     "express-handlebars": "^3.1.0",
-    "node-fetch": "^2.6.0",
-    "todotxt-parser": "^1.0.2"
+    "node-fetch": "^2.6.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"

@@ -3,6 +3,6 @@
 <table>
     <tr><td>Context</td><td>Task</td></tr>
     {{#each tasks}}
-	<tr><td>{{context}}</td><td>{{task}}</td></tr>
+      <tr><td>{{this.context}}</td><td>{{this.task}}</td></tr>
     {{/each}}
 </table>
