@@ -2,7 +2,6 @@
 require('dotenv').config();
 const Dropbox = require('dropbox').Dropbox
 const fetch = require('node-fetch')
-const debug = require('debug')('taskviz')
 const express = require('express')
 const exphb = require('express-handlebars')
 
@@ -15,11 +14,13 @@ const app = express();
 app.engine('handlebars', exphb())
 app.set('view engine', 'handlebars')
 
+function getData(req) {
+  return fetch(new URL(`${req.protocol}://${req.hostname}:${req.client.localPort}/data`)).then(res => res.json())
+}
+
 app.get('/', (req, res) => {
-  debug('GET /')
-  fetch(new URL(`${req.protocol}://${req.hostname}:${req.client.localPort}${req.path}data`))
-    .then(res => res.json())
-    .then(data => {
+  const debug = require('debug')('taskviz')
+    getData(req).then(data => {
       debug('Success from /data %O', data)
       res.render('home',  { tasks : data.filter(a => a.date != null && a.context != null) })
     })
@@ -29,8 +30,24 @@ app.get('/', (req, res) => {
     })
 })
 
+app.get('/viz', (req, res) => {
+  const debug = require('debug')('taskviz')
+  getData(req)
+    .then(data => {
+      res.render('vizhome', { tasks : data.filter(a => a.date != null && a.context != null)})
+    })
+    .catch((err) => {
+      debug('Error from /data %s', err)
+      res.render('error', { error_detail : err })
+    })
+})
+
+app.get('/script.js', (req, res) => {
+
+})
+
 app.get('/data', (req, res) => {
-  debug('GET /data')
+  const debug = require('debug')('taskviz:api')
   dbclient.filesGetTemporaryLink({ path : process.env.DROPBOX_FILEPATH })
     .then((files) => {
       debug('Dropbox call success, got temp link', files.link)
@@ -40,7 +57,7 @@ app.get('/data', (req, res) => {
           debug('Fetch of temp link success %s', text)
           const tasks =  text.split('\n').map((task) => {
             debug('Task in map %s', task)
-            const [full, done_date, priority, context, text] = 
+            const [full, done_date, priority, context, text] =
               task.match(/^(?:x\s+(\d{4}-\d{2}-\d{2})\s+)?(?:\(([A-za-z]{1})\)\s+)?(?:(@\S+)\s+)?(.*)/i)
             if (full) {
               debug('Task match %o', full)
