@@ -24,13 +24,13 @@ app.get('/', (req, res) => {
         .then(fetchres => fetchres.text())
         .then(text => {
           debug('Fetch of temp link success %s', text)
-          const tasks = { tasks : text.split('\n').map((task) => {
+          const tasks =  text.split('\n').map((task) => {
             debug('Task in map %s', task)
             const split_task = task.match(/^(?:x\s+\d{4}-\d{2}-\d{2}\s+)?(?:\(([A-za-z]{1})\)\s+)?(?:(@\S+)\s+)?(.*)/i)
             debug('Task match %o', split_task)
             if (!split_task) { debug('NO MATCH %s', task) }
             return { context : split_task[2], task : split_task[3]}
-          })}
+          })
           debug('Map done %O', tasks)
           res.render('home',  { tasks : tasks })
         })
