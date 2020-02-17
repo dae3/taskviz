@@ -26,13 +26,18 @@ app.get('/', (req, res) => {
           debug('Fetch of temp link success %s', text)
           const tasks =  text.split('\n').map((task) => {
             debug('Task in map %s', task)
-            const split_task = task.match(/^(?:x\s+\d{4}-\d{2}-\d{2}\s+)?(?:\(([A-za-z]{1})\)\s+)?(?:(@\S+)\s+)?(.*)/i)
-            debug('Task match %o', split_task)
-            if (!split_task) { debug('NO MATCH %s', task) }
-            return { context : split_task[2], task : split_task[3]}
-          })
+            const [full, done_date, priority, context, text] = 
+              task.match(/^(?:x\s+(\d{4}-\d{2}-\d{2})\s+)?(?:\(([A-za-z]{1})\)\s+)?(?:(@\S+)\s+)?(.*)/i)
+            if (full) {
+              debug('Task match %o', full)
+              return { context : context, task : text, date : done_date }
+            } else {
+              debug('Task regex didn\'t match %s', full)
+              return null
+            }
+          }).filter(a => a != null)
           debug('Map done %O', tasks)
-          res.render('home',  { tasks : tasks })
+          res.render('home',  { tasks : tasks.filter(a => a.date != null && a.context != null) })
         })
         .catch((error) => {
           debug('Fetch of temp link, format failed %O', error)
