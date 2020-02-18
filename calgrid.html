@@ -1,0 +1,28 @@
+<html>
+    <head>
+	<title>calgrid</title>
+	<style type="text/css">
+div.mbox {
+    height: 200px; width: 200px; background-color: gray;
+	margin: 2px;
+	display: inline-block; border: 2px solid black;
+}
+	</style>
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script type="text/javascript">
+	    function dateFormat(d) { return d.getMonth() }
+	    const months = Array.apply(undefined, Array(12)).map((a,i)=>i).map(a=>new Date(2020,a,1))
+	    async function load(){
+		var cal = d3.select("body").select("div#cal").selectAll("div.mbox")
+		    .data(months).text(dateFormat)
+
+		cal.enter().append("div")
+		    .classed("mbox", true)
+		    .text(dateFormat)
+	    }
+	</script>
+    </head>
+    <body onload="load()">
+	<div id="cal"><div class="mbox">dummy</div></div>
+    </body>
+</html>
