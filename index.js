@@ -4,10 +4,13 @@ const Dropbox = require('dropbox').Dropbox
 const fetch = require('node-fetch')
 const express = require('express')
 const exphb = require('express-handlebars')
+const cache = require('node-cache')
+
+const filecache = new cache()
 
 const dbclient = new Dropbox({
-  accessToken : process.env.DROPBOX_TOKEN,
-  fetch : fetch
+	accessToken : process.env.DROPBOX_TOKEN,
+	fetch : fetch
 })
 
 const app = express();
@@ -15,70 +18,75 @@ app.engine('handlebars', exphb())
 app.set('view engine', 'handlebars')
 
 function getData(req) {
-  return fetch(new URL(`${req.protocol}://${req.hostname}:${req.client.localPort}/data`)).then(res => res.json())
+	return fetch(new URL(`${req.protocol}://${req.hostname}:${req.client.localPort}/data`)).then(res => res.json())
 }
 
 app.get('/', (req, res) => {
-  const debug = require('debug')('taskviz')
-    getData(req).then(data => {
-      debug('Success from /data %O', data)
-      res.render('home',  { tasks : data.filter(a => a.date != null && a.context != null) })
-    })
-    .catch((err) => {
-      debug('Error from /data %s', err)
-      res.render('error', { error_detail : err })
-    })
+	const debug = require('debug')('taskviz')
+	getData(req).then(data => {
+		debug('Success from /data %O', data)
+		res.render('home',  { tasks : data.filter(a => a.date != null && a.context != null) })
+	})
+		.catch((err) => {
+			debug('Error from /data %s', err)
+			res.render('error', { error_detail : err })
+		})
 })
 
 app.get('/viz', (req, res) => {
-  const debug = require('debug')('taskviz')
-  getData(req)
-    .then(data => {
-      res.render('vizhome', { tasks : data.filter(a => a.date != null && a.context != null)})
-    })
-    .catch((err) => {
-      debug('Error from /data %s', err)
-      res.render('error', { error_detail : err })
-    })
+	const debug = require('debug')('taskviz')
+	res.render('vizhome')
 })
 
 app.get('/script.js', (req, res) => {
 
 })
 
+function getFile(filename) {
+	var cachedfile = filecache.get(filename)
+	const debug = require('debug')('taskviz:cache')
+	if (!cachedfile) {
+		debug(`Cache miss on ${filename}`)
+		return new Promise((resolve, reject) => {
+			dbclient.filesGetTemporaryLink({ path : filename })
+				.then(files => { debug('Dropbox link fetch success'); return fetch(files.link) })
+				.then(res => { debug('Fetch of temp link success'); return res.text() })
+				.then(text => {
+					debug('Text of temp link fetch success')
+					filecache.set(filename, text)
+					resolve(text)
+				})
+		})
+	} else {
+		debug(`Cache hit on ${filename}`)
+		return Promise.resolve(cachedfile)
+	}
+}
+
 app.get('/data', (req, res) => {
-  const debug = require('debug')('taskviz:api')
-  dbclient.filesGetTemporaryLink({ path : process.env.DROPBOX_FILEPATH })
-    .then((files) => {
-      debug('Dropbox call success, got temp link', files.link)
-      fetch(files.link)
-        .then(fetchres => fetchres.text())
-        .then(text => {
-          debug('Fetch of temp link success %s', text)
-          const tasks =  text.split('\n').map((task) => {
-            debug('Task in map %s', task)
-            const [full, done_date, priority, context, text] =
-              task.match(/^(?:x\s+(\d{4}-\d{2}-\d{2})\s+)?(?:\(([A-za-z]{1})\)\s+)?(?:(@\S+)\s+)?(.*)/i)
-            if (full) {
-              debug('Task match %o', full)
-              return { context : context, task : text, date : done_date }
-            } else {
-              debug('Task regex didn\'t match %s', full)
-              return null
-            }
-          }).filter(a => a != null)
-          debug('Map done %O', tasks)
-          res.status(200).json(tasks)
-        })
-        .catch((error) => {
-          debug('Fetch of temp link, format failed %O', error)
-          res.status(500).json(error)
-        })
-    })
-    .catch((error) => {
-      debug('Dropbox call failed %O', error)
-      res.status(500).json(error)
-    })
+	const debug = require('debug')('taskviz:api')
+	getFile(process.env.DROPBOX_FILEPATH)
+		.then(text => {
+			debug('Fetch of file success %s', text)
+			const tasks =  text.split('\n').map((task) => {
+				debug('Task in map %s', task)
+				const [full, done_date, priority, context, text] =
+					task.match(/^(?:x\s+(\d{4}-\d{2}-\d{2})\s+)?(?:\(([A-za-z]{1})\)\s+)?(?:(@\S+)\s+)?(.*)/i)
+				if (full) {
+					debug('Task match %o', full)
+					return { context : context, task : text, date : done_date }
+				} else {
+					debug('Task regex didn\'t match %s', full)
+					return null
+				}
+			}).filter(a => a != null)
+			debug('Map done %O', tasks)
+			res.status(200).json(tasks)
+		})
+		.catch((error) => {
+			debug('Fetch of temp link, format failed %O', error)
+			res.status(500).json(error)
+		})
 })
 
 app.listen(process.env.PORT)

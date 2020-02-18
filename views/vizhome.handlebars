@@ -1,37 +1,46 @@
 <h1>taskviz</h1>
-  <script type="text/javascript">
-    function pText(task) { return `${task.context}: ${task.task}` }
+<script type="text/javascript">
+    function pText(task) { return `${task.date} - ${task.context}: ${task.task}` }
 
     const colorForContext = new Map()
     colorForContext.set('@Office', "red")
+    colorForContext.set('@Phone', "orange")
     colorForContext.set('@Online', "green")
     colorForContext.set('@Online-Work', "green")
     colorForContext.set('@Home', "blue")
-    function getColorForContext(task) { 
-      if (colorForContext.has(task.context)) {
-        return colorForContext.get(task.context)
-      } else {
-        return "black"
-      }
+    function getColorForContext(task) {
+	if (colorForContext.has(task.context)) {
+	    return colorForContext.get(task.context)
+	} else {
+	    return "black"
+	}
     }
 
     async function load(){
-      const data = await d3.json('/data')
+	const data = await d3.json('/data')
 
-      console.log(`${data.length} tasks loaded`)
+	console.log(`${data.length} tasks loaded`)
 
-      var p = d3.select("body").select("div#viz").selectAll("p")
-        .data(data).text(pText)
-        .style("background-color", getColorForContext)
+	var p = d3.select("body").select("div#viz").selectAll("p")
+	    .data(data.sort(t=>t.date)).text(pText)
+	    .style("background-color", getColorForContext)
 
-      p.enter().append("p").text(pText)
-        .style("background-color", getColorForContext)
+	p.enter().append("p").text(pText)
+	    .style("background-color", getColorForContext)
 
-      p.exit().remove()
+	p.exit().remove()
+
+	var h = d3.histogram().value((task) => {
+	    const [_, year, month, day] =  task.date.match(/(\d{4})-(\d{2})-(\d{2})/)
+	    return `${year}-${month}`
+	})
+	var hh = h(data.filter(t=>t.date))
     }
 
     load()
-  </script>
-  <div id="viz">
+</script>
+<div id="viz">
     <p>dummy</p>
-  </div>
+</div>
+<div id="test">
+</div>
