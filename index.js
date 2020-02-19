@@ -5,6 +5,8 @@ const fetch = require('node-fetch')
 const express = require('express')
 const exphb = require('express-handlebars')
 const cache = require('node-cache')
+const fs = require('fs')
+const path = require('path')
 
 const filecache = new cache()
 
@@ -38,8 +40,20 @@ app.get('/viz', (req, res) => {
 	res.render('vizhome')
 })
 
-app.get('/script.js', (req, res) => {
-
+app.get('/static/:asset', (req, res) => {
+  const debug = require('debug')('taskviz:static')
+  if (!req.params.asset) { debug('400'); res.status(400).end('Missing asset parameter') }
+  else if (!req.params.asset.match('[A-Za-z0-9\.]')) { debug(`400 ${req.params.asset}`); res.status(400).end('Invalid asset name') }
+  else {
+    res.status(200)
+    debug('Asset param OK, attempting stream')
+    var s = fs.createReadStream(path.format({ dir: process.env.STATIC_PATH, base: req.params.asset }))
+    s.on('error', e => {
+      if (e.code == 'ENOENT') { debug('404'); res.status(404).end() }
+      else { debug(`500 ${err}`); res.status(500).end() }
+    })
+    s.pipe(res)
+  }
 })
 
 function getFile(filename) {
