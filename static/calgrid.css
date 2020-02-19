@@ -2,3 +2,11 @@ div.mbox {
   height: 200px; width: 200px; background-color: lightgray;
   margin: 2px;
   display: inline-block; border: 1px solid black;
+  overflow-wrap: break-word;
+}
+
+span.taskdot {
+  background-color: lightblue;
+  border-radius: 2px;
+  font-size: 5pt;
+}
