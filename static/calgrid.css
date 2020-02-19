@@ -1,3 +1,15 @@
+div#cal {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+div.mbox > div.monthlabel {
+    height: 100%;
+    width: 100%;
+    line-height: 200px;
+    text-align: center;
+}
+
 div.mbox {
   height: 200px; width: 200px; background-color: lightgray;
   margin: 2px;
