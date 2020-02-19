@@ -35,6 +35,11 @@ app.get('/', (req, res) => {
 		})
 })
 
+app.get('/calgrid', (req, res) => {
+	const debug = require('debug')('taskviz')
+	res.render('calgrid')
+})
+
 app.get('/viz', (req, res) => {
 	const debug = require('debug')('taskviz')
 	res.render('vizhome')
@@ -46,7 +51,7 @@ app.get('/static/:asset', (req, res) => {
   else if (!req.params.asset.match('[A-Za-z0-9\.]')) { debug(`400 ${req.params.asset}`); res.status(400).end('Invalid asset name') }
   else {
     res.status(200)
-    debug('Asset param OK, attempting stream')
+    debug(`Asset param OK, attempting stream of ${req.params.asset}`)
     var s = fs.createReadStream(path.format({ dir: process.env.STATIC_PATH, base: req.params.asset }))
     s.on('error', e => {
       if (e.code == 'ENOENT') { debug('404'); res.status(404).end() }
