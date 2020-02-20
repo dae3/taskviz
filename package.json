@@ -7,6 +7,9 @@
     "start": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "nodemonConfig": {
+    "ignore": ["static/*"]
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
