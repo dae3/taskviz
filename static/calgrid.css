@@ -22,3 +22,9 @@ span.taskdot {
   border-radius: 2px;
   font-size: 5pt;
 }
+
+rect.task {
+    fill: lightblue;
+    fill-opacity: 0.5;
+    stroke: blue;
+}
