@@ -37,7 +37,7 @@ async function load () {
       }
     )
 
-  const treedata = d3.treemap().size([500, 500])(d3.hierarchy(root).count())
+  const treedata = d3.treemap().size([1000, 1000])(d3.hierarchy(root).count())
 
   // group for each month
   const monthgroup = d3.select('svg#cals').selectAll('g.month')
@@ -82,7 +82,7 @@ async function load () {
     .attr('href', d => `#rect${d.ancestors()[0].data.id}`)
 
   const TEXTOFFSETX = PADDING + 2
-  const TEXTOFFSETY = PADDING + 9
+  const TEXTOFFSETY = PADDING + 15
 
   contextgroup
     .append('text')
@@ -90,6 +90,10 @@ async function load () {
     .text(d => `${d.data.data} ${d.value}`)
     .attr('x', d => d.x0 - d.ancestors()[1].x0 + TEXTOFFSETX)
     .attr('y', d => d.y0 - d.ancestors()[1].y0 + TEXTOFFSETY)
+
+  contextgroup
+    .append('title')
+    .text(d => `${d.data.data} ${d.value}`)
 }
 
 load()

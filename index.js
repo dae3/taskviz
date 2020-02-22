@@ -35,12 +35,8 @@ app.get('/', (req, res) => {
     })
 })
 
-app.get('/calgrid', (_req, res) => {
-  res.render('calgrid')
-})
-
-app.get('/viz', (_req, res) => {
-  res.render('vizhome')
+app.get('/treemap', (_req, res) => {
+  res.render('treemap')
 })
 
 app.get('/static/:asset', (req, res) => {
