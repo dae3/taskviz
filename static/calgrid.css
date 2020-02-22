@@ -1,0 +1,39 @@
+div#cal {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+div.mbox > div.monthlabel {
+    height: 100%;
+    width: 100%;
+    line-height: 200px;
+    text-align: center;
+}
+
+div.mbox {
+  height: 200px; width: 200px; background-color: lightgray;
+  margin: 2px;
+  display: inline-block; border: 1px solid black;
+  overflow-wrap: break-word;
+}
+
+span.taskdot {
+  background-color: lightblue;
+  border-radius: 2px;
+  font-size: 5pt;
+}
+
+g.context rect {
+    fill: lightgreen;
+    stroke: lightgreen;
+}
+
+g.month > rect {
+    stroke: grey;
+    fill-opacity: 0;
+}
+
+g.context > text {
+  font-family: sans-serif;
+  font-size: 8pt;
+}
