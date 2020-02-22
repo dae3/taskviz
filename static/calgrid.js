@@ -40,22 +40,49 @@ async function load() {
     }, [])
 
   const taskdata = d3.stratify().id(d => d.name).parentId(d => d.parent)(root).count()
-  const treedata = d3.treemap()(taskdata)
+  const treedata = d3.treemap().size([500, 500])(taskdata)
 
-  const SCALE = 500
-
-  const monthgroup = d3.select('svg#cals').selectAll('rect')
+  // group for each month
+  const monthgroup = d3.select('svg#cals').selectAll('g.month')
     .data(treedata.children)
     .join('g')
-    .attr("transform", d => `translate(${d.x0*SCALE},${d.y0*SCALE})`)
+    .classed('month', true)
+    .attr('transform', d => `translate(${d.x0},${d.y0})`)
 
   monthgroup
-    .append('rect').classed('task', true)
-    .attr('width', d=>(d.x1-d.x0)*SCALE).attr('height', d=>(d.y1-d.y0)*SCALE)
+    .append('rect')
+    .attr('width', d => (d.x1 - d.x0))
+    .attr('height', d => (d.y1 - d.y0))
 
   monthgroup
-    .append('text').text(d => d.data.name)
-    .attr('x', 10).attr('y', 10)
+    .append('text')
+    .text(d => d.data.name)
+    .attr('x', 10)
+    .attr('y', 20)
+
+  // each context
+  const contextgroup = monthgroup
+    .selectAll('g.context')
+    .data(d => d.children)
+    .join('g')
+    .classed('context', true)
+
+  const PADDING = 2
+
+  contextgroup
+    .append('rect')
+    .attr('x', d => (d.x0 - d.ancestors()[1].x0) + PADDING)
+    .attr('y', d => (d.y0 - d.ancestors()[1].y0) + PADDING)
+    .attr('width', d => (d.x1 - d.x0) - PADDING * 2)
+    .attr('height', d => (d.y1 - d.y0) - PADDING * 2)
+
+  const TEXTOFFSET = PADDING + 10
+
+  contextgroup
+    .append('text')
+    .text(d => d.data.name.replace(/\d+$/, ''))
+    .attr('x', d => d.x0 - d.ancestors()[1].x0 + TEXTOFFSET)
+    .attr('y', d => d.y0 - d.ancestors()[1].y0 + TEXTOFFSET)
 }
 
 load()
