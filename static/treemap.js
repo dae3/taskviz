@@ -1,5 +1,5 @@
 async function load () {
-  const tasks = await d3.json('/data')
+  const tasks = await d3.json(`${process.env.ROOTPATH}/data`)
 
   // template hierarchichal data structure for d3.treemap
   // children array elements are months
