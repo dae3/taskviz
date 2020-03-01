@@ -6,3 +6,12 @@ steps:
     image: node
     commands:
       - npm install
+  - name: container
+    image: plugins/docker
+    settings:
+      username: dae3
+      password:
+        from_secret: DOCKERHUB_PASSWORD
+      repo: dae3/tools
+      dockerfile: docker/Dockerfile.prod
+      tags: taskviz
