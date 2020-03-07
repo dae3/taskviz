@@ -82,6 +82,48 @@ function getFile (filename) {
   }
 }
 
+app.get('/data/:from/:to', (req, res) => {
+  const debug = require('debug')('taskviz:api')
+
+  const fromMatch = req.params.from.match(/(\d{4})-(\d{2})-(\d{2})/)
+  const toMatch = req.params.to.match(/(\d{4})-(\d{2})-(\d{2})/)
+
+  if (fromMatch === null || toMatch === null) {
+    res.status(400).end('from and to parameters must be yyyy-mm-dd dates')
+  } else {
+    const fromDate = new Date(fromMatch[1], fromMatch[2], fromMatch[3])
+    const toDate = new Date(toMatch[1], toMatch[2], toMatch[3])
+
+    getFile(process.env.DROPBOX_FILEPATH)
+      .then(text => {
+        debug('Fetch of file success')
+        const tasks = text.split('\n').map((task) => {
+          const regmatch = task.match(/^(?:x\s+(\d{4})-(\d{2})-(\d{2})\s+)(?:\(([A-za-z]{1})\)\s+)?(?:@(\S+)\s+)(.*)/i)
+          if (regmatch) {
+            const [full, year, month, day, priority, context, text] = regmatch
+            const taskDate = new Date(year, month, day)
+            debug('Task match %o', full)
+            const project = text.match(/\+(\w+)/)
+            if (fromDate <= taskDate && taskDate <= toDate) {
+              return { context: context, priority: priority, project: project ? project[1] : null, task: text, date: new Date(year, month, day) }
+            } else {
+              return null
+            }
+          } else {
+            debug('Task regex didn\'t match %s', task)
+            return null
+          }
+        }).filter(a => a != null)
+        debug('Map done %O', tasks)
+        res.status(200).json(tasks)
+      })
+      .catch((error) => {
+        debug('Fetch of temp link, format failed %O', error)
+        res.status(500).json(error)
+      })
+  }
+})
+
 app.get('/data', (_req, res) => {
   const debug = require('debug')('taskviz:api')
   getFile(process.env.DROPBOX_FILEPATH)
