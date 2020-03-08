@@ -125,6 +125,8 @@ function setupTreemap (data) {
           .attr('y', d => (d.y0 - d.ancestors()[1].y0) + PADDING)
           .attr('width', d => (d.x1 - d.x0) - PADDING * 2)
           .attr('height', d => (d.y1 - d.y0) - PADDING * 2)
+          .attr('fill', d => colourForContext(d.data.data))
+          .attr('stroke', d => colourForContext(d.data.data))
 
         // clip path for text, using the context rect
         contextgroup
@@ -160,6 +162,24 @@ function setupTreemap (data) {
         exit.select('text').remove()
         exit.remove()
       })
+}
+
+function colourForContext (contextName) {
+  const colours = new Map()
+  colours.set('Waiting', 'maroon')
+  colours.set('Office', 'blue')
+  colours.set('Home', 'green')
+  colours.set('Online-Work', 'teal')
+  colours.set('Outside', 'darkgreen')
+  colours.set('Shops', 'darkgoldenrod')
+  colours.set('Online', 'cadetblue')
+  colours.set('Phone', 'darkorchid')
+
+  if (colours.has(contextName)) {
+    return colours.get(contextName)
+  } else {
+    return 'gray'
+  }
 }
 
 async function updateTreemap (from, to) {
