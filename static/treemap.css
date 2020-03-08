@@ -1,4 +1,4 @@
-g.month > text {
+svg.month > text {
   text-anchor: middle;
   font-family: sans-serif;
   font-size: 20pt;
@@ -11,7 +11,7 @@ g.context rect {
     fill-opacity: 0.2;
 }
 
-g.month > rect {
+svg.month > rect {
     stroke: lightgrey;
     fill-opacity: 0;
 }
