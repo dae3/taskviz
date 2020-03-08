@@ -60,6 +60,8 @@ function setupTreemap (data) {
   // group for each month
   const monthgroup = d3.select('svg#cals').selectAll('svg.month')
     .data(data.children, d => d.data.id)
+
+  monthgroup
     .join(
       enter => {
         const group = enter.append('svg')
@@ -105,41 +107,59 @@ function setupTreemap (data) {
     )
 
   // each context
-//  const contextgroup = monthgroup
-//    .selectAll('g.context')
-//    .data(d => d.children)
-//    .join('g').classed('context', true)
-//
-//  const PADDING = 2
-//
-//  contextgroup
-//    .append('rect')
-//    .attr('id', d => `rect${d.ancestors()[0].data.id}`)
-//    .attr('x', d => (d.x0 - d.ancestors()[1].x0) + PADDING)
-//    .attr('y', d => (d.y0 - d.ancestors()[1].y0) + PADDING)
-//    .attr('width', d => (d.x1 - d.x0) - PADDING * 2)
-//    .attr('height', d => (d.y1 - d.y0) - PADDING * 2)
-//
-//  // clip path for text, using the context rect
-//  contextgroup
-//    .append('clipPath')
-//    .attr('id', d => `clip${d.ancestors()[0].data.id}`)
-//    .append('use')
-//    .attr('href', d => `#rect${d.ancestors()[0].data.id}`)
-//
-//  const TEXTOFFSETX = PADDING + 2
-//  const TEXTOFFSETY = PADDING + 15
-//
-//  contextgroup
-//    .append('text')
-//    .attr('clip-path', d => `url(#clip${d.ancestors()[0].data.id})`)
-//    .text(d => `${d.data.data} ${d.value}`)
-//    .attr('x', d => d.x0 - d.ancestors()[1].x0 + TEXTOFFSETX)
-//    .attr('y', d => d.y0 - d.ancestors()[1].y0 + TEXTOFFSETY)
-//
-//  contextgroup
-//    .append('title')
-//    .text(d => `${d.data.data} ${d.value}`)
+  const PADDING = 2
+  const TEXTOFFSETX = PADDING + 2
+  const TEXTOFFSETY = PADDING + 15
+
+  d3.select('svg#cals').selectAll('svg.month')
+    .selectAll('g.context')
+    .data(d => d.children)
+    .join(
+      enter => {
+        const contextgroup = enter.append('g').classed('context', true)
+
+        contextgroup
+          .append('rect')
+          .attr('id', d => `rect${d.ancestors()[0].data.id}`)
+          .attr('x', d => (d.x0 - d.ancestors()[1].x0) + PADDING)
+          .attr('y', d => (d.y0 - d.ancestors()[1].y0) + PADDING)
+          .attr('width', d => (d.x1 - d.x0) - PADDING * 2)
+          .attr('height', d => (d.y1 - d.y0) - PADDING * 2)
+
+        // clip path for text, using the context rect
+        contextgroup
+          .append('clipPath')
+          .attr('id', d => `clip${d.ancestors()[0].data.id}`)
+          .append('use')
+          .attr('href', d => `#rect${d.ancestors()[0].data.id}`)
+
+        contextgroup
+          .append('text')
+          .attr('clip-path', d => `url(#clip${d.ancestors()[0].data.id})`)
+          .text(d => `${d.data.data} ${d.value}`)
+          .attr('x', d => d.x0 - d.ancestors()[1].x0 + TEXTOFFSETX)
+          .attr('y', d => d.y0 - d.ancestors()[1].y0 + TEXTOFFSETY)
+
+        contextgroup
+          .append('title')
+          .text(d => `${d.data.data} ${d.value}`)
+      },
+      update => {
+        update.select('rect')
+          .attr('x', d => (d.x0 - d.ancestors()[1].x0) + PADDING)
+          .attr('y', d => (d.y0 - d.ancestors()[1].y0) + PADDING)
+          .attr('width', d => (d.x1 - d.x0) - PADDING * 2)
+          .attr('height', d => (d.y1 - d.y0) - PADDING * 2)
+
+        update.select('text')
+          .attr('x', d => d.x0 - d.ancestors()[1].x0 + TEXTOFFSETX)
+          .attr('y', d => d.y0 - d.ancestors()[1].y0 + TEXTOFFSETY)
+      },
+      exit => {
+        exit.select('rect').remove()
+        exit.select('text').remove()
+        exit.remove()
+      })
 }
 
 async function updateTreemap (from, to) {
