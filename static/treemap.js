@@ -48,7 +48,9 @@ async function load (from, to) {
         }
       )
 
-    return d3.treemap().size([1000, 1000])(d3.hierarchy(root).count())
+    return d3.treemap()
+      .padding(1)
+      .size([1000, 1000])(d3.hierarchy(root).count())
   }
 }
 
@@ -73,6 +75,7 @@ function setupTreemap (data) {
           .attr('y', d => d.y0)
 
         group.append('rect')
+          .classed('month', true)
           .transition(t)
           .attr('width', d => (d.x1 - d.x0))
           .attr('height', d => (d.y1 - d.y0))

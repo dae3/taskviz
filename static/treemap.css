@@ -5,13 +5,16 @@ svg.month > text {
   fill: lightgray;
 }
 
+rect.month {
+  stroke: silver;
+}
+
 g.context rect {
-    fill-opacity: 0.2;
+  stroke: transparent;
+  fill-opacity: 0.2;
 }
 
 svg.month > rect {
-    stroke: black;
-    stroke-dasharray: 4;
     fill-opacity: 0;
 }
 
