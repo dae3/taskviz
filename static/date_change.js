@@ -2,11 +2,9 @@ async function attach () {
   const from = document.getElementById('fromDate')
   const to = document.getElementById('toDate')
 
-  // const now = new Date()
-  // to.valueAsDate = now
-  // from.valueAsDate = new Date(now.getFullYear(), now.getMonth(), 1)
-  from.valueAsDate = new Date(2018, 11, 31, 23)
-  to.valueAsDate = new Date(2019, 11, 31)
+  const now = new Date()
+  to.valueAsDate = now
+  from.valueAsDate = new Date(now.getFullYear(), 0, 1)
 
   from.addEventListener('input', dateChange)
   to.addEventListener('input', dateChange)

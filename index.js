@@ -91,8 +91,8 @@ app.get('/data/:from/:to', (req, res) => {
   if (fromMatch === null || toMatch === null) {
     res.status(400).end('from and to parameters must be yyyy-mm-dd dates')
   } else {
-    const fromDate = new Date(fromMatch[1], fromMatch[2], fromMatch[3])
-    const toDate = new Date(toMatch[1], toMatch[2], toMatch[3])
+    const fromDate = new Date(fromMatch[1], fromMatch[2] - 1, fromMatch[3])
+    const toDate = new Date(toMatch[1], toMatch[2] - 1, toMatch[3])
 
     getFile(process.env.DROPBOX_FILEPATH)
       .then(text => {
@@ -101,11 +101,21 @@ app.get('/data/:from/:to', (req, res) => {
           const regmatch = task.match(/^(?:x\s+(\d{4})-(\d{2})-(\d{2})\s+)(?:\(([A-za-z]{1})\)\s+)?(?:@(\S+)\s+)(.*)/i)
           if (regmatch) {
             const [full, year, month, day, priority, context, text] = regmatch
-            const taskDate = new Date(year, month, day)
+            const taskDate = new Date(year, month - 1, day)
             debug('Task match %o', full)
             const project = text.match(/\+(\w+)/)
             if (fromDate <= taskDate && taskDate <= toDate) {
-              return { context: context, priority: priority, project: project ? project[1] : null, task: text, date: new Date(year, month, day) }
+              return {
+                context: context,
+                priority: priority,
+                project: project ? project[1] : null,
+                task: text,
+                date: {
+                  year: year,
+                  month: month,
+                  day: day
+                }
+              }
             } else {
               return null
             }

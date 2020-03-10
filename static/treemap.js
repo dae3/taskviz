@@ -4,6 +4,11 @@ function dateParam (date) {
   return `${date.getFullYear()}-${m < 10 ? '0' : ''}${m}-${d < 10 ? '0' : ''}${d}`
 }
 
+function monthName (monthNum) {
+  const curYear = (new Date()).getFullYear()
+  return (new Date(curYear, monthNum - 1, 1).toLocaleDateString(undefined, { month: 'short' }))
+}
+
 async function load (from, to) {
   if (from !== null && to !== null) {
     const tasks = await d3.json(`data/${dateParam(from)}/${dateParam(to)}`)
@@ -23,17 +28,12 @@ async function load (from, to) {
 
     // create root
     const root = new HierTemplate(null, 'root')
-    const monthName = (monthNum) => {
-      const curYear = (new Date()).getFullYear()
-      return (new Date(curYear, monthNum, 1).toLocaleDateString(undefined, { month: 'short' }))
-    }
 
     // insert tasks into hierarchy
     tasks
-      .map(task => { task.date = new Date(task.date); return task })
       .forEach(
         task => {
-          const month = task.date.getMonth()
+          const month = task.date.month
           var monthElement = root.children.find(m => m.id === month)
           if (!monthElement) {
             monthElement = new HierTemplate(root.id, month, monthName(month))
