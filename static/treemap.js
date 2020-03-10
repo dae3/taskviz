@@ -110,10 +110,8 @@ function setupTreemap (data) {
     )
 
   // each context
-  const PADDING = 2
-  const TEXTOFFSETX = PADDING + 2
-  const TEXTOFFSETY = PADDING + 15
-
+  const TEXTOFFSETX = 4
+  const TEXTOFFSETY = 17
   d3.select('svg#cals').selectAll('svg.month')
     .selectAll('g.context')
     .data(d => d.children)
@@ -124,10 +122,10 @@ function setupTreemap (data) {
         contextgroup
           .append('rect')
           .attr('id', d => `rect${d.ancestors()[0].data.id}`)
-          .attr('x', d => (d.x0 - d.ancestors()[1].x0) + PADDING)
-          .attr('y', d => (d.y0 - d.ancestors()[1].y0) + PADDING)
-          .attr('width', d => (d.x1 - d.x0) - PADDING * 2)
-          .attr('height', d => (d.y1 - d.y0) - PADDING * 2)
+          .attr('x', d => (d.x0 - d.ancestors()[1].x0))
+          .attr('y', d => (d.y0 - d.ancestors()[1].y0))
+          .attr('width', d => (d.x1 - d.x0))
+          .attr('height', d => (d.y1 - d.y0))
           .attr('fill', d => colourForContext(d.data.data))
           .attr('stroke', d => colourForContext(d.data.data))
 
@@ -151,10 +149,10 @@ function setupTreemap (data) {
       },
       update => {
         update.select('rect')
-          .attr('x', d => (d.x0 - d.ancestors()[1].x0) + PADDING)
-          .attr('y', d => (d.y0 - d.ancestors()[1].y0) + PADDING)
-          .attr('width', d => (d.x1 - d.x0) - PADDING * 2)
-          .attr('height', d => (d.y1 - d.y0) - PADDING * 2)
+          .attr('x', d => (d.x0 - d.ancestors()[1].x0))
+          .attr('y', d => (d.y0 - d.ancestors()[1].y0))
+          .attr('width', d => (d.x1 - d.x0))
+          .attr('height', d => (d.y1 - d.y0))
 
         update.select('text')
           .attr('x', d => d.x0 - d.ancestors()[1].x0 + TEXTOFFSETX)
