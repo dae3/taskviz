@@ -1,7 +1,16 @@
 <link rel="stylesheet" href="static/treemap.css">
 <script src="static/treemap.js"></script>
 <script src="static/date_change.js"></script>
-<p><label for="fromDate">From: </label><input id="fromDate" type="date" name="from" /></p>
-<p><label for="toDate">To: </label><input id="toDate" type="date" name="to" /></p>
-<svg id="cals" viewBox="0 0 1000 1000" width="100%" >
-</svg>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-4">
+      <label for="fromDate">From</label><input id="fromDate" type="date" name="from" /></span>
+    </div>
+    <div class="col-4">
+      <label for="toDate">To</label><input id="toDate" type="date" name="to" />
+    </div>
+  </div>
+</div>
+<div class="container">
+  <svg id="cals" viewBox="0 0 1000 1000" width="100%" ></svg>
+</div>
